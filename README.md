@@ -31,10 +31,11 @@ pnpm dev:antd
 
 后台只负责登录和管理界面。前端登录人员存在 **linjing-backend**，需要同时启动：
 
-```bash
-# 另一个终端，在 linjing-backend 仓库
-python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```powershell
+# 另一个终端，在 linjing-backend 仓库（Windows）
+git checkout cursor/uni-login-users-d4b8
+.\setup.ps1
+.\start-dev.ps1
 ```
 
 1. 保持后端在 `127.0.0.1:8000`

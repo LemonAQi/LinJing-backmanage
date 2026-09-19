@@ -127,11 +127,25 @@ onMounted(() => {
           在 `linjing-backend` 目录执行：
         </div>
         <code>
-          python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+          .\start-dev.ps1
         </code>
         <div class="mt-2">
-          然后在浏览器打开 linjing-uni（pnpm dev），用 alex / 123456 登录，再点刷新。
+          必须先看到 `[LinJing] API started`。然后浏览器打开 linjing-uni（pnpm
+          dev），用 alex / 123456 登录，再点刷新。
         </div>
+      </template>
+    </Alert>
+    <Alert
+      v-else-if="!loading && dataSource.length === 0"
+      class="mb-4"
+      show-icon
+      type="info"
+    >
+      <template #message>
+        还没有登录记录
+      </template>
+      <template #description>
+        用浏览器打开 linjing-uni（pnpm dev），登录 alex / 123456，再点刷新。
       </template>
     </Alert>
     <Card>
