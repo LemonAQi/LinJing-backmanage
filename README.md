@@ -23,7 +23,7 @@ pnpm install
 pnpm dev:antd
 ```
 
-启动成功后访问 `http://localhost:5555`（端口以终端输出为准）。
+启动成功后访问 `http://localhost:5666`（`apps/web-antd` 默认开发端口，以终端输出为准）。
 
 默认演示账号：`vben` / `123456`
 
