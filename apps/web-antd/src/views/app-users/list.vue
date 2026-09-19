@@ -3,17 +3,19 @@ import type { TableColumnsType, TablePaginationConfig } from 'ant-design-vue';
 
 import type { AppUserApi } from '#/api/app-users';
 
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 import { Page } from '@vben/common-ui';
 
-import { Button, Card, Input, Space, Table, Tag, message } from 'ant-design-vue';
+import { Alert, Button, Card, Input, Space, Table, Tag } from 'ant-design-vue';
 
 import { getAppUserList } from '#/api/app-users';
 
 const loading = ref(false);
 const keyword = ref('');
 const dataSource = ref<AppUserApi.AppUser[]>([]);
+const backendOffline = ref(false);
+const loadError = ref('');
 const pagination = reactive({
   current: 1,
   pageSize: 10,
@@ -51,8 +53,20 @@ const columns: TableColumnsType<AppUserApi.AppUser> = [
   },
 ];
 
+const statusDescription = computed(() => {
+  if (loadError.value) {
+    return loadError.value;
+  }
+  if (backendOffline.value) {
+    return '还没有连上林鲸后端。请先启动 linjing-backend，再刷新本页。';
+  }
+  return '这里列出从林鲸 App 登录过的人员。后台账号登录仍走 Vben 演示账号。';
+});
+
 async function fetchList() {
   loading.value = true;
+  loadError.value = '';
+  backendOffline.value = false;
   try {
     const data = await getAppUserList({
       keyword: keyword.value.trim(),
@@ -61,12 +75,14 @@ async function fetchList() {
     });
     dataSource.value = data.items ?? [];
     pagination.total = data.total ?? 0;
-  } catch {
+    backendOffline.value = Boolean(data.backendOffline);
+  } catch (error) {
     dataSource.value = [];
     pagination.total = 0;
-    message.error(
-      '无法加载 Uni 登录用户。请确认 linjing-backend 已在 127.0.0.1:8000 运行。',
-    );
+    loadError.value =
+      error instanceof Error
+        ? error.message
+        : '无法加载 App 用户列表，请稍后重试。';
   } finally {
     loading.value = false;
   }
@@ -89,10 +105,28 @@ onMounted(() => {
 </script>
 
 <template>
-  <Page
-    description="这里列出从林鲸 uni-app 成功登录过的人员。后台账号登录仍走 Vben 演示账号。"
-    title="Uni 登录用户"
-  >
+  <Page :description="statusDescription" title="App 用户">
+    <Alert
+      v-if="backendOffline || loadError"
+      class="mb-4"
+      show-icon
+      type="warning"
+    >
+      <template #message>
+        启动林鲸后端后即可看到 App 登录人员
+      </template>
+      <template #description>
+        <div>
+          在 `linjing-backend` 目录执行：
+        </div>
+        <code>
+          python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+        </code>
+        <div class="mt-2">
+          然后用林鲸 App 登录（演示账号 fluie / 123456），再点刷新。
+        </div>
+      </template>
+    </Alert>
     <Card>
       <Space class="mb-4" wrap>
         <Input
@@ -115,7 +149,7 @@ onMounted(() => {
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'login_source'">
-            <Tag color="processing">{{ record.login_source || 'uni' }}</Tag>
+            <Tag color="processing">App</Tag>
           </template>
           <template v-else-if="column.dataIndex === 'last_login_at'">
             {{ record.last_login_at || '-' }}

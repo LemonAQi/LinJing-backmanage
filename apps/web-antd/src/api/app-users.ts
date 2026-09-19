@@ -12,6 +12,7 @@ export namespace AppUserApi {
   }
 
   export interface AppUserList {
+    backendOffline?: boolean;
     items: AppUser[];
     total: number;
   }

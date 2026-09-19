@@ -27,6 +27,23 @@ pnpm dev:antd
 
 默认演示账号：`vben` / `123456`
 
+## 查看 App 用户
+
+后台只负责登录和管理界面。App 登录人员存在 **linjing-backend**，需要同时启动：
+
+```bash
+# 另一个终端，在 linjing-backend 仓库
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+1. 保持后端在 `127.0.0.1:8000`
+2. 本仓库执行 `pnpm dev:antd`，用 `vben` / `123456` 登录
+3. 打开侧栏 **App 用户**
+4. 用林鲸 App 登录 `fluie` / `123456` 后刷新列表
+
+后端地址不是 8000 时，启动管理端前设置 `LINJING_API_TARGET`，例如 `http://127.0.0.1:8000`。
+
 其他 UI 变体：
 
 ```bash
