@@ -60,8 +60,15 @@ const statusDescription = computed(() => {
   if (backendOffline.value) {
     return '还没有连上林鲸后端。请先启动 linjing-backend，再刷新本页。';
   }
-  return '这里列出从林鲸 App 登录过的人员。后台账号登录仍走 Vben 演示账号。';
+  return '这里列出从林鲸前端（当前是浏览器 pnpm dev）登录过的人员。后台账号登录仍走 Vben 演示账号。';
 });
+
+function sourceLabel(source?: null | string) {
+  if (source === 'app') {
+    return 'App';
+  }
+  return 'Web';
+}
 
 async function fetchList() {
   loading.value = true;
@@ -113,7 +120,7 @@ onMounted(() => {
       type="warning"
     >
       <template #message>
-        启动林鲸后端后即可看到 App 登录人员
+        启动林鲸后端后即可看到登录人员
       </template>
       <template #description>
         <div>
@@ -123,7 +130,7 @@ onMounted(() => {
           python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
         </code>
         <div class="mt-2">
-          然后用林鲸 App 登录（演示账号 fluie / 123456），再点刷新。
+          然后在浏览器打开 linjing-uni（pnpm dev），用 alex / 123456 登录，再点刷新。
         </div>
       </template>
     </Alert>
@@ -149,7 +156,7 @@ onMounted(() => {
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'login_source'">
-            <Tag color="processing">App</Tag>
+            <Tag color="processing">{{ sourceLabel(record.login_source) }}</Tag>
           </template>
           <template v-else-if="column.dataIndex === 'last_login_at'">
             {{ record.last_login_at || '-' }}
